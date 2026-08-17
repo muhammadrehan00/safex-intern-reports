@@ -1,0 +1,78 @@
+/* =========================================================================
+   SafeX Solutions — Print stylesheet
+   Fallback export path: File > Print > Save as PDF when JS export is
+   unavailable. Always renders light/paper regardless of the on-screen theme.
+   ========================================================================= */
+
+@media print {
+  @page { size: A4 portrait; margin: 14mm 12mm; }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  :root, [data-theme="dark"] {
+    --sx-bg: #fff;
+    --sx-surface: #fff;
+    --sx-border: #ccc;
+    --sx-text-900: #000;
+    --sx-text-600: #333;
+    --sx-text-400: #666;
+  }
+
+  .sx-topbar-actions,
+  .sx-toolbar,
+  .sx-active-filters,
+  .sx-pagination,
+  .sx-toast,
+  .sx-drawer-overlay,
+  .sx-tabs,
+  .skip-link,
+  #sx-pdf-btn,
+  #sx-csv-btn,
+  #sx-print-btn,
+  #sx-theme-toggle,
+  .sx-no-print {
+    display: none !important;
+  }
+
+  .sx-app { max-width: 100%; padding: 0; }
+
+  .sx-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sx-chart-wrap { height: 260px !important; }
+
+  .sx-table-scroll { overflow: visible !important; border: 1px solid #ccc !important; }
+
+  table.sx-table { min-width: 0 !important; width: 100% !important; font-size: 10.5pt; }
+
+  .sx-table thead th {
+    background: #0b1f33 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sx-badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .sx-progress-fill {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  table.sx-table tbody tr[data-paginated-hidden="true"] {
+    display: table-row !important;
+  }
+
+  a[href]::after { content: ""; }
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intern Progress Reports — SafeX Solutions</title>
+  <meta
+    name="description"
+    content="SafeX Solutions intern progress reporting dashboard: weekly and per-track completion trends, searchable and sortable intern records, and one-click PDF/CSV export."
+  />
+  <meta name="theme-color" content="#0b1f33" />
+  <link rel="manifest" href="manifest.json" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/print.css" media="print" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+
+  <!-- Set theme before first paint to avoid a flash of the wrong theme -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("sx-theme");
+        var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#reportRoot">Skip to report</a>
+
+  <div class="sx-app">
+    <!-- ============ Top bar ============ -->
+    <header class="sx-topbar">
+      <div class="sx-brand">
+        <div class="sx-logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 40c0 6 5 9 12 9s11-3 11-8c0-11-19-8-19-16 0-4 4-6 9-6 4 0 8 1 10 4l-4 4c-2-2-4-3-7-3-3 0-5 1-5 3 0 6 19 3 19 15 0 8-7 12-15 12s-15-4-15-11z" fill="#fff" />
+          </svg>
+        </div>
+        <div class="sx-brand-text">
+          <span class="sx-brand-name">SafeX Solutions</span>
+          <span class="sx-brand-sub">INTERN OPS · REPORTS</span>
+        </div>
+      </div>
+      <div class="sx-topbar-actions">
+        <button id="sx-theme-toggle" class="sx-btn sx-btn-icon-only" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+          <svg class="sx-btn-icon sx-theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="sx-btn-icon sx-theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button id="sx-print-btn" class="sx-btn sx-btn-ghost" type="button">
+          <svg class="sx-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span class="sx-btn-label-full">Print</span>
+        </button>
+        <button id="sx-csv-btn" class="sx-btn sx-btn-ghost" type="button">
+          <svg class="sx-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="sx-btn-label-full">CSV</span>
+        </button>
+        <button id="sx-pdf-btn" class="sx-btn sx-btn-primary" type="button">
+          <svg class="sx-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="sx-btn-label-full">Download PDF</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="reportRoot">
+      <div class="sx-page-head">
+        <div>
+          <h1>Intern Progress Report</h1>
+          <p>Weekly completion trends across all active tracks · Generated <span id="generatedAt">—</span></p>
+        </div>
+      </div>
+
+      <!-- ============ Stat strip ============ -->
+      <section class="sx-stats" aria-label="Summary statistics">
+        <div class="sx-stat-card">
+          <div class="sx-stat-label">Avg. completion</div>
+          <div class="sx-stat-value accent" id="statAvg" data-target="0">0%</div>
+        </div>
+        <div class="sx-stat-card">
+          <div class="sx-stat-label">Active interns</div>
+          <div class="sx-stat-value" id="statInterns" data-target="0">0</div>
+        </div>
+        <div class="sx-stat-card">
+          <div class="sx-stat-label">On track</div>
+          <div class="sx-stat-value" id="statOnTrack" data-target="0">0</div>
+        </div>
+        <div class="sx-stat-card">
+          <div class="sx-stat-label">At risk</div>
+          <div class="sx-stat-value warn" id="statAtRisk" data-target="0">0</div>
+        </div>
+      </section>
+
+      <!-- ============ Chart ============ -->
+      <section class="sx-card" aria-labelledby="chartHeading">
+        <div class="sx-card-head">
+          <div>
+            <h2 id="chartHeading">Completion Trends</h2>
+            <div class="sx-card-desc" id="chartDesc">Average across filtered interns, vs. 80% target</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div class="sx-legend" id="chartLegend" aria-hidden="true">
+              <span><i style="background:#0f9e94"></i>Avg. completion</span>
+              <span><i style="background:#e2a53a"></i>Target (80%)</span>
+            </div>
+            <div class="sx-tabs" role="tablist" aria-label="Chart view">
+              <button class="sx-tab" id="tabWeekly" role="tab" aria-selected="true" type="button">By Week</button>
+              <button class="sx-tab" id="tabTrack" role="tab" aria-selected="false" type="button">By Track</button>
+            </div>
+          </div>
+        </div>
+        <div class="sx-chart-wrap">
+          <canvas id="completionChart" role="img" aria-label="Chart of intern task completion percentage"></canvas>
+        </div>
+      </section>
+
+      <!-- ============ Table ============ -->
+      <section class="sx-card" aria-labelledby="tableHeading">
+        <div class="sx-card-head">
+          <div>
+            <h2 id="tableHeading">Intern Records</h2>
+            <div class="sx-card-desc">Search, filter, sort, and export the underlying data</div>
+          </div>
+        </div>
+
+        <div class="sx-toolbar sx-no-print">
+          <div class="sx-search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <label for="searchInput" class="sr-only">Search interns by name</label>
+            <input type="search" id="searchInput" placeholder="Search interns…" autocomplete="off" />
+            <button class="sx-search-clear" id="searchClear" type="button" aria-label="Clear search">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="sx-field">
+            <label for="trackFilter">Track</label>
+            <select id="trackFilter"><option value="all">All tracks</option></select>
+          </div>
+          <div class="sx-field">
+            <label for="weekFilter">Week</label>
+            <select id="weekFilter"><option value="all">All weeks</option></select>
+          </div>
+          <div class="sx-field">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter"><option value="all">All statuses</option></select>
+          </div>
+          <div class="sx-field">
+            <label for="pageSizeSelect">Rows per page</label>
+            <select id="pageSizeSelect">
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sx-active-filters sx-no-print" id="activeFilters" aria-live="polite"></div>
+
+        <div class="sx-table-scroll">
+          <table class="sx-table">
+            <thead>
+              <tr>
+                <th scope="col"><button class="sx-th-btn" data-sort="name" aria-sort="none">Intern<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+                <th scope="col"><button class="sx-th-btn" data-sort="track" aria-sort="none">Track<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+                <th scope="col"><button class="sx-th-btn" data-sort="week" aria-sort="none">Week<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+                <th scope="col" class="num"><button class="sx-th-btn num" data-sort="tasksCompleted" aria-sort="none">Tasks<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+                <th scope="col"><button class="sx-th-btn" data-sort="completionPct" aria-sort="descending">Completion<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+                <th scope="col"><button class="sx-th-btn" data-sort="status" aria-sort="none">Status<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="sx-empty" id="emptyState">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <h3>No records match your filters</h3>
+          <p>Try a different search term or clear a filter to see more results.</p>
+          <button class="sx-btn sx-btn-ghost" id="clearFiltersBtn" type="button">Clear all filters</button>
+        </div>
+
+        <div class="sx-pagination sx-no-print">
+          <div class="sx-pagination-info" id="paginationInfo" aria-live="polite"></div>
+          <nav class="sx-pagination-controls" id="paginationControls" aria-label="Table pagination"></nav>
+        </div>
+      </section>
+    </main>
+
+    <footer class="sx-footer">SafeX Solutions · Intern Management System · Reports Module v3.0</footer>
+  </div>
+
+  <!-- Intern detail drawer -->
+  <div class="sx-drawer-overlay" id="drawerOverlay" aria-hidden="true">
+    <aside class="sx-drawer" role="dialog" aria-modal="true" aria-labelledby="drawerName" id="drawerPanel">
+      <div class="sx-drawer-head">
+        <div>
+          <h3 id="drawerName">—</h3>
+          <p id="drawerTrack">—</p>
+        </div>
+        <button class="sx-drawer-close" id="drawerClose" type="button" aria-label="Close panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sx-drawer-stats">
+        <div class="sx-drawer-stat"><span class="lbl">Avg.</span><span class="val" id="drawerAvg">—</span></div>
+        <div class="sx-drawer-stat"><span class="lbl">Best week</span><span class="val" id="drawerBest">—</span></div>
+        <div class="sx-drawer-stat"><span class="lbl">Latest</span><span class="val" id="drawerLatest">—</span></div>
+      </div>
+      <div class="sx-drawer-chart"><canvas id="drawerChart" role="img" aria-label="Line chart of this intern's completion percentage across all weeks"></canvas></div>
+      <ul class="sx-drawer-history" id="drawerHistory"></ul>
+    </aside>
+  </div>
+
+  <div id="sx-toast" class="sx-toast" role="status" aria-live="polite">
+    <span class="sx-spinner" aria-hidden="true"></span>
+    <span id="sx-toast-text">Generating PDF…</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
